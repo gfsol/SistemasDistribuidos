@@ -1,57 +1,61 @@
-"""Needed classes to implement and serve the RSet type."""
-
+import json
 from typing import Optional
-
 import Ice
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
-
-from remotetypes.customset import StringSet
-
+import os
+from remotetypes.iterable import Iterable  # Importar la clase Iterable
 
 class RemoteSet(rt.RSet):
     """Implementation of the remote interface RSet."""
 
-    def __init__(self, identifier) -> None:
-        """Initialise a RemoteSet with an empty StringSet."""
-        self._storage_ = StringSet()
-        self.id_ = identifier
+    def __init__(self, identifier: Optional[str] = None) -> None:
+        """Initialise a RemoteSet with an empty set or load from file."""
+        self.storage = set()
+        self.identifier = identifier
+        self.file_path = f"{self.identifier}.json" if identifier else None
+        if identifier:
+            self._load_from_file()
 
-    def identifier(self, current: Optional[Ice.Current] = None) -> str:
-        """Return the identifier of the object."""
-        return self.id_
+    def _load_from_file(self) -> None:
+        """Load the set from a JSON file."""
+        if self.file_path:
+            try:
+                with open(self.file_path, "r") as file:
+                    self.storage = set(json.load(file))
+            except FileNotFoundError:
+                pass
+
+    def _save_to_file(self) -> None:
+        """Save the set to a JSON file."""
+        if self.file_path:
+            with open(self.file_path, "w") as file:
+                json.dump(list(self.storage), file)
+
+    def add(self, item: str, current: Optional[Ice.Current] = None) -> None:
+        """Add an element to the set."""
+        self.storage.add(item)
+        self._save_to_file()
 
     def remove(self, item: str, current: Optional[Ice.Current] = None) -> None:
-        """Remove an item from the StringSet if added. Else, raise a remote exception."""
-        try:
-            self._storage_.remove(item)
-        except KeyError as error:
-            raise rt.KeyError(item) from error
-
-    def length(self, current: Optional[Ice.Current] = None) -> int:
-        """Return the number of elements in the StringSet."""
-        return len(self._storage_)
+        """Remove an item from the set."""
+        self.storage.remove(item)
+        self._save_to_file()
 
     def contains(self, item: str, current: Optional[Ice.Current] = None) -> bool:
-        """Check the pertenence of an item to the StringSet."""
-        return item in self._storage_
+        """Check if the set contains an item."""
+        return item in self.storage
+
+    def length(self, current: Optional[Ice.Current] = None) -> int:
+        """Return the number of elements in the set."""
+        return len(self.storage)
 
     def hash(self, current: Optional[Ice.Current] = None) -> int:
-        """Calculate a hash from the content of the internal StringSet."""
-        contents = list(self._storage_)
-        contents.sort()
-        return hash(repr(contents))
+        """Calculate a hash from the content of the set."""
+        return hash(frozenset(self.storage))
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
         """Create an iterable object."""
-
-    def add(self, item: str, current: Optional[Ice.Current] = None) -> None:
-        """Add a new string to the StringSet."""
-        self._storage_.add(item)
-
-    def pop(self, current: Optional[Ice.Current] = None) -> str:
-        """Remove and return an element from the storage."""
-        try:
-            return self._storage_.pop()
-
-        except KeyError as exc:
-            raise rt.KeyError() from exc
+        iterable = Iterable(list(self.storage))
+        adapter = current.adapter
+        proxy = adapter.addWithUUID(iterable)
+        return rt.IterablePrx.uncheckedCast(proxy)
