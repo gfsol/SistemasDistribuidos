@@ -1,15 +1,16 @@
-""" Client module for the Ice application. """
+"""Client module for the Ice application."""
 import sys
 import Ice
 import RemoteTypes
 
 class Client(Ice.Application):
     """Client class for the Ice application."""
+
     def run(self, args):
         """Run the client application."""
         proxy = self.communicator().stringToProxy("factory:tcp -h localhost -p 4062")
         factory = RemoteTypes.FactoryPrx.checkedCast(proxy)
-        
+
         if not factory:
             raise RuntimeError("Proxie invalido")
 
@@ -21,10 +22,10 @@ class Client(Ice.Application):
 
         rdict = factory.get(RemoteTypes.TypeName.RDict, "Ejemplo de diccionario")
         rdict = RemoteTypes.RDictPrx.checkedCast(rdict)
-        
+
         if not rlist or not rset or not rdict:
             raise RuntimeError("Proxie invalido")
-        
+
         rdict.setItem("key1", "value1")
         rdict.setItem("key2", "value2")
         rset.add("item1")
@@ -35,10 +36,10 @@ class Client(Ice.Application):
         rlist.append("item4")
 
         print(rdict.getItem("key1"))
-        
+
         print(rlist.getItem(0))
         print(rlist.pop(0))
-        
+
 
 if __name__ == "__main__":
     app = Client()

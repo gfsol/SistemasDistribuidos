@@ -1,8 +1,8 @@
+"""Needed classes to implement and serve the RList type."""
 import json
 from typing import Optional
 import Ice
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
-import os
 from remotetypes.iterable import Iterable  # Importar la clase Iterable
 
 class RemoteList(rt.RList):
