@@ -1,9 +1,12 @@
+""" Client module for the Ice application. """
 import sys
 import Ice
 import RemoteTypes
 
 class Client(Ice.Application):
+    """Client class for the Ice application."""
     def run(self, args):
+        """Run the client application."""
         proxy = self.communicator().stringToProxy("factory:tcp -h localhost -p 4062")
         factory = RemoteTypes.FactoryPrx.checkedCast(proxy)
         

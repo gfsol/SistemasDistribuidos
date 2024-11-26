@@ -10,7 +10,7 @@ class Iterable(rt.Iterable):
         self.iterator = iter(collection)
         self.modified = False
 
-     def next(self, current: Optional[Ice.Current] = None):
+    def next(self, current: Optional[Ice.Current] = None):
         """Return the next element in the iteration."""
         if self.modified:
             raise rt.CancelIteration("The collection has been modified")
@@ -25,7 +25,7 @@ class Iterable(rt.Iterable):
         proxy = adapter.addWithUUID(self)
         return rt.IterablePrx.uncheckedCast(proxy)
 
-   
+
 class SetIterable(Iterable):
     """Iterable implementation for sets."""
 
