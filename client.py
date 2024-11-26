@@ -18,21 +18,24 @@ class Client(Ice.Application):
 
         rdict = factory.get(RemoteTypes.TypeName.RDict, "Ejemplo de diccionario")
         rdict = RemoteTypes.RDictPrx.checkedCast(rdict)
-
+        
         if not rlist or not rset or not rdict:
             raise RuntimeError("Proxie invalido")
+        
         rdict.setItem("key1", "value1")
-        rdict.setItem("key2", "value")
+        rdict.setItem("key2", "value2")
         rset.add("item1")
         rset.add("item2")
         rlist.append("item1")
         rlist.append("item2")
         rlist.append("item3")
         rlist.append("item4")
+
+        print(rdict.getItem("key1"))
         
         print(rlist.getItem(0))
         print(rlist.pop(0))
-
+        
 
 if __name__ == "__main__":
     app = Client()
