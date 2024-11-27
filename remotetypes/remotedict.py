@@ -75,7 +75,7 @@ class RemoteDict(rt.RDict):
 
     def iter(self, current: Optional[Ice.Current] = None) -> rt.IterablePrx:
         """Create an iterable object."""
-        iterable = Iterable(list(self.storage.items()))
+        iterable = Iterable(list(self.storage.keys()))
         adapter = current.adapter
         proxy = adapter.addWithUUID(iterable)
         return rt.IterablePrx.uncheckedCast(proxy)
