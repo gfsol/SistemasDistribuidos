@@ -3,7 +3,7 @@
 import RemoteTypes as rt  # noqa: F401; pylint: disable=import-error
 
 class Iterable(rt.Iterable):
-    """Iterable implementation."""
+    """Skeleton for an Iterable implementation."""
 
     def __init__(self, collection):
         """Initialize the iterable instance with the collection to iterate over."""

@@ -20,7 +20,7 @@ class RemoteSet(rt.RSet):
         """Load the set from a JSON file."""
         if self.file_path:
             try:
-                with open(self.file_path, "r") as file:
+                with open(self.file_path, "r", encoding="utf-8") as file:
                     self.storage = set(json.load(file))
             except FileNotFoundError:
                 pass
@@ -28,7 +28,7 @@ class RemoteSet(rt.RSet):
     def _save_to_file(self) -> None:
         """Save the set to a JSON file."""
         if self.file_path:
-            with open(self.file_path, "w") as file:
+            with open(self.file_path, "w", encoding="utf-8") as file:
                 json.dump(list(self.storage), file)
 
     def add(self, item: str, current: Optional[Ice.Current] = None) -> None:
